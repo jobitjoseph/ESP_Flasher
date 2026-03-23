@@ -86,7 +86,7 @@ function renderProjects() {
     `<option value="${p.id}">${p.name} (v${p.version || '—'}) [${p.chip}]</option>`
   ).join('');
 
-  select.innerHTML = '<option value="" disabled>— Choose a Project —</option>' + options;
+  select.innerHTML = '<option value="" disabled selected>— Choose a Project —</option>' + options;
 }
 
 window.selectProject = selectProject;
