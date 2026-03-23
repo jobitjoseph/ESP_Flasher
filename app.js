@@ -66,11 +66,6 @@ async function loadConfig() {
     STATE.config = await res.json();
     log('info', `Loaded ${STATE.config.projects.length} project(s) from config.`);
     renderProjects();
-
-    // Auto-select if only one project exists
-    if (STATE.config.projects.length === 1) {
-      selectProject(STATE.config.projects[0].id);
-    }
   } catch (e) {
     log('error', `Failed to load config.json: ${e.message}`);
     showToast('Failed to load project config', 'error');
