@@ -349,7 +349,7 @@ window.handleFlash = async function () {
 
       try {
         const buffer = await fetchFirmwareBinary(project.id, f.file_id);
-        flashFiles.push({ data: new Uint8Array(buffer), address: parseInt(f.address, 16) });
+        flashFiles.push({ data: arrayBufferToBinaryString(buffer), address: parseInt(f.address, 16) });
         setBadgeState(f.file_id, 'done');
       } catch (e) {
         setBadgeState(f.file_id, 'error');
@@ -398,9 +398,10 @@ window.handleFlash = async function () {
         setProgress(Math.min(overallPct, 100), `Writing ${fileLabel}…`);
       },
       calculateMD5Hash(image) {
-        // image is already a Uint8Array from esptool-js
-        const words = CryptoJS.lib.WordArray.create(image);
-        return CryptoJS.MD5(words).toString();
+        const wordarray = (typeof image === 'string')
+          ? CryptoJS.enc.Latin1.parse(image)
+          : CryptoJS.lib.WordArray.create(image);
+        return CryptoJS.MD5(wordarray).toString();
       },
     });
 
@@ -460,6 +461,16 @@ function makeTerminal() {
 // ════════════════════════════════════════════════════
 //  UTILITY
 // ════════════════════════════════════════════════════
+function arrayBufferToBinaryString(buffer) {
+  const bytes = new Uint8Array(buffer);
+  const chunks = [];
+  const CHUNK = 8192;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    chunks.push(String.fromCharCode(...bytes.subarray(i, i + CHUNK)));
+  }
+  return chunks.join('');
+}
+
 function disableFlashUI(disabled) {
   ['btn-connect', 'btn-flash', 'btn-erase'].forEach(id => {
     const el = document.getElementById(id);
