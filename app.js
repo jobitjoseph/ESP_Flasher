@@ -94,6 +94,7 @@ function renderProjects() {
   select.innerHTML = '<option value="" disabled>— Choose a Project —</option>' + options;
 }
 
+window.selectProject = selectProject;
 function selectProject(id) {
   if (!id) return;
   STATE.selectedProject = STATE.config.projects.find(p => p.id === id);
