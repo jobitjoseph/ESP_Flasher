@@ -1,0 +1,25 @@
+{
+  "projects": [
+    {
+      "id": "esp32c3_blinky",
+      "name": "ESP32-C3 Blinky Example",
+      "chip": "ESP32C3",
+      "version": "1.0.0",
+      "description": "A simple LED blinking example for the ESP32-C3. Flash to address 0x00.",
+      "baud_options": [
+        115200,
+        460800,
+        921600
+      ],
+      "baud_default": 921600,
+      "flash_size": "4MB",
+      "flash": [
+        {
+          "address": "0x0",
+          "file_id": "esp32c3_blinky.bin",
+          "label": "Blinky Merged Binary"
+        }
+      ]
+    }
+  ]
+}
