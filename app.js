@@ -10,26 +10,26 @@ import { ESPLoader, Transport } from "https://unpkg.com/esptool-js@0.4.6/bundle.
 // ════════════════════════════════════════════════════
 const STATE = {
   selectedProject: null,
-  port:            null,
-  transport:       null,
-  espLoader:       null,
-  isFlashing:      false,
-  abortFlash:      false,
-  config:          null,
+  port: null,
+  transport: null,
+  espLoader: null,
+  isFlashing: false,
+  abortFlash: false,
+  config: null,
 };
 
 // ════════════════════════════════════════════════════
 //  THEME
 // ════════════════════════════════════════════════════
-window.setTheme = function(theme) {
+window.setTheme = function (theme) {
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('esp-flasher-theme', theme);
-  document.getElementById('btn-dark').classList.toggle('active',  theme === 'dark');
+  document.getElementById('btn-dark').classList.toggle('active', theme === 'dark');
   document.getElementById('btn-light').classList.toggle('active', theme === 'light');
 };
 
 // Restore saved theme on load
-(function() {
+(function () {
   const saved = localStorage.getItem('esp-flasher-theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
 })();
@@ -66,7 +66,7 @@ async function loadConfig() {
     STATE.config = await res.json();
     log('info', `Loaded ${STATE.config.projects.length} project(s) from config.`);
     renderProjects();
-    
+
     // Auto-select if only one project exists
     if (STATE.config.projects.length === 1) {
       selectProject(STATE.config.projects[0].id);
@@ -87,7 +87,7 @@ function renderProjects() {
     return;
   }
 
-  const options = STATE.config.projects.map(p => 
+  const options = STATE.config.projects.map(p =>
     `<option value="${p.id}">${p.name} (v${p.version || '—'}) [${p.chip}]</option>`
   ).join('');
 
@@ -103,16 +103,16 @@ function selectProject(id) {
   if (select.value !== id) select.value = id;
 
   const cfg = STATE.selectedProject;
-  
+
   // Enable config controls and update labels
   const configControls = document.getElementById('config-controls');
   if (configControls) configControls.classList.remove('config-disabled');
-  
+
   document.getElementById('project-desc-text').textContent = cfg.description || cfg.name;
 
   const badge = document.getElementById('chip-badge');
   badge.textContent = cfg.chip;
-  badge.className = `project-chip chip-active`; 
+  badge.className = `project-chip chip-active`;
 
   const bauds = document.getElementById('baud-select');
   if (bauds) {
@@ -138,7 +138,7 @@ function updateFileBadges() {
 // ════════════════════════════════════════════════════
 //  SERIAL CONNECTION
 // ════════════════════════════════════════════════════
-window.handleConnect = async function() {
+window.handleConnect = async function () {
   if (!('serial' in navigator)) {
     showToast('Web Serial not supported in this browser', 'error');
     return;
@@ -147,7 +147,7 @@ window.handleConnect = async function() {
   try {
     log('info', 'Requesting serial port…');
     STATE.port = await navigator.serial.requestPort();
-    
+
     // We don't open it here to avoid conflicts later.
     // handleFlash or handleErase will open it at the correct baud rate.
     setConnectionState('connected');
@@ -169,11 +169,11 @@ window.handleConnect = async function() {
   }
 };
 
-window.handleReset = async function() {
+window.handleReset = async function () {
   if (!STATE.port) return;
   try {
     log('info', 'Hard resetting device…');
-    
+
     // If not already flashing, we need to create a temporary loader
     if (!STATE.transport) {
       if (STATE.port.readable) await STATE.port.close();
@@ -193,14 +193,14 @@ window.handleReset = async function() {
   }
 };
 
-window.handleCancel = function() {
+window.handleCancel = function () {
   if (STATE.isFlashing) {
     STATE.abortFlash = true;
     log('warn', '🛑 Cancellation requested…');
   }
 };
 
-window.handleDisconnect = async function() {
+window.handleDisconnect = async function () {
   try {
     if (STATE.transport) { STATE.transport.disconnect(); STATE.transport = null; }
     if (STATE.port && STATE.port.readable) await STATE.port.close();
@@ -213,7 +213,7 @@ window.handleDisconnect = async function() {
 };
 
 function setConnectionState(status) {
-  const dot  = document.getElementById('status-dot');
+  const dot = document.getElementById('status-dot');
   const text = document.getElementById('status-text');
   const btnC = document.getElementById('btn-connect');
   const connActions = document.getElementById('connection-actions');
@@ -242,7 +242,7 @@ function updateFlashButtons() {
 
   document.getElementById('btn-flash').disabled = !(connected && hasProject) || flashing;
   document.getElementById('btn-erase').disabled = !connected || flashing;
-  
+
   const cancelBtn = document.getElementById('btn-cancel');
   if (cancelBtn) {
     cancelBtn.style.display = flashing ? 'inline-block' : 'none';
@@ -277,7 +277,7 @@ async function fetchFirmwareBinary(projectId, fileId) {
 // ════════════════════════════════════════════════════
 //  ERASE
 // ════════════════════════════════════════════════════
-window.handleErase = async function() {
+window.handleErase = async function () {
   if (!STATE.port) { showToast('Connect a device first', 'warning'); return; }
   if (!confirm('⚠️ This will completely erase the flash memory. Continue?')) return;
 
@@ -296,7 +296,7 @@ window.handleErase = async function() {
       await STATE.port.close();
     }
     const transport = new Transport(STATE.port, true);
-    const loader    = new ESPLoader({ transport, baudrate: baud, terminal: makeTerminal() });
+    const loader = new ESPLoader({ transport, baudrate: baud, terminal: makeTerminal() });
 
     await loader.main();
     await loader.eraseFlash();
@@ -319,17 +319,17 @@ window.handleErase = async function() {
 // ════════════════════════════════════════════════════
 //  FLASH
 // ════════════════════════════════════════════════════
-window.handleFlash = async function() {
+window.handleFlash = async function () {
   if (!STATE.selectedProject) { showToast('Select a project first', 'warning'); return; }
-  if (!STATE.port)            { showToast('Connect a device first',  'warning'); return; }
-  if (STATE.isFlashing)       return;
+  if (!STATE.port) { showToast('Connect a device first', 'warning'); return; }
+  if (STATE.isFlashing) return;
 
   STATE.isFlashing = true; STATE.abortFlash = false;
   updateFlashButtons();
   setConnectionState('flashing');
 
   const project = STATE.selectedProject;
-  const baud    = parseInt(document.getElementById('baud-select').value);
+  const baud = parseInt(document.getElementById('baud-select').value);
 
   document.getElementById('progress-section').style.display = 'block';
   updateFileBadges();
@@ -348,8 +348,8 @@ window.handleFlash = async function() {
       setProgress(Math.round((i / totalFiles) * 30), `Fetching ${f.label || f.file_id}…`);
 
       try {
-        const binary = await fetchFirmwareBinary(project.id, f.file_id);
-        flashFiles.push({ data: arrayBufferToBinaryString(binary), address: parseInt(f.address, 16) });
+        const buffer = await fetchFirmwareBinary(project.id, f.file_id);
+        flashFiles.push({ data: new Uint8Array(buffer), address: parseInt(f.address, 16) });
         setBadgeState(f.file_id, 'done');
       } catch (e) {
         setBadgeState(f.file_id, 'error');
@@ -382,23 +382,25 @@ window.handleFlash = async function() {
     setProgress(50, 'Writing firmware…');
 
     await loader.writeFlash({
-      fileArray:    flashFiles,
-      flashSize:    project.flash_size || 'keep',
-      flashMode:    'keep',
-      flashFreq:    'keep',
-      eraseAll:     false,
-      compress:     true,
+      fileArray: flashFiles,
+      flashSize: project.flash_size || 'keep',
+      flashMode: 'keep',
+      flashFreq: 'keep',
+      eraseAll: false,
+      compress: true,
       reportProgress(fileIndex, written, total) {
         if (STATE.abortFlash) throw new Error('Flash aborted by user.');
-        
-        const filePct    = (written / total);
+
+        const filePct = (written / total);
         const overallPct = Math.round(50 + ((fileIndex + filePct) / totalFiles) * 50);
-        
-        const fileLabel  = project.flash[fileIndex]?.label || `File ${fileIndex + 1}`;
+
+        const fileLabel = project.flash[fileIndex]?.label || `File ${fileIndex + 1}`;
         setProgress(Math.min(overallPct, 100), `Writing ${fileLabel}…`);
       },
       calculateMD5Hash(image) {
-        return CryptoJS.MD5(CryptoJS.lib.WordArray.create(image)).toString();
+        // image is already a Uint8Array from esptool-js
+        const words = CryptoJS.lib.WordArray.create(image);
+        return CryptoJS.MD5(words).toString();
       },
     });
 
@@ -425,9 +427,9 @@ window.handleFlash = async function() {
 // ════════════════════════════════════════════════════
 function setProgress(pct, label) {
   const bar = document.getElementById('progress-bar');
-  if (bar) bar.style.width   = `${pct}%`;
+  if (bar) bar.style.width = `${pct}%`;
   const pctEl = document.getElementById('progress-pct');
-  if (pctEl) pctEl.textContent   = `${pct}%`;
+  if (pctEl) pctEl.textContent = `${pct}%`;
   const lbl = document.getElementById('progress-label');
   if (lbl) lbl.textContent = label;
 }
@@ -442,7 +444,7 @@ function setBadgeState(fileId, state) {
 // ════════════════════════════════════════════════════
 function makeTerminal() {
   return {
-    clean()         { /* no-op */ },
+    clean() { /* no-op */ },
     writeLine(data) { log('dim', data); },
     write(data) {
       if (typeof data === 'string') {
@@ -458,16 +460,6 @@ function makeTerminal() {
 // ════════════════════════════════════════════════════
 //  UTILITY
 // ════════════════════════════════════════════════════
-function arrayBufferToBinaryString(buffer) {
-  const bytes  = new Uint8Array(buffer);
-  const chunks = [];
-  const CHUNK  = 8192;
-  for (let i = 0; i < bytes.length; i += CHUNK) {
-    chunks.push(String.fromCharCode(...bytes.subarray(i, i + CHUNK)));
-  }
-  return chunks.join('');
-}
-
 function disableFlashUI(disabled) {
   ['btn-connect', 'btn-flash', 'btn-erase'].forEach(id => {
     const el = document.getElementById(id);
@@ -480,11 +472,11 @@ function disableFlashUI(disabled) {
 // ════════════════════════════════════════════════════
 function log(type, message) {
   const console = document.getElementById('log-console');
-  const time    = new Date().toLocaleTimeString('en-US', { hour12: false });
+  const time = new Date().toLocaleTimeString('en-US', { hour12: false });
 
   const line = document.createElement('div');
   line.className = 'log-line';
-  
+
   let sanitized = message.replace(/[^\x20-\x7E\s\u00A0-\u00FF]/g, '');
 
   if (sanitized.length > 1500) {
@@ -508,11 +500,11 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;');
 }
 
-window.clearLog = function() {
+window.clearLog = function () {
   document.getElementById('log-console').innerHTML = '';
 };
 
-window.copyLog = function() {
+window.copyLog = function () {
   const text = [...document.querySelectorAll('.log-text')]
     .map(el => el.textContent).join('\n');
   navigator.clipboard.writeText(text).then(() => showToast('Log copied', 'success'));
@@ -521,7 +513,7 @@ window.copyLog = function() {
 window.showToast = showToast;
 function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
-  const toast     = document.createElement('div');
+  const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.innerHTML = `<span></span> ${escapeHtml(message)}`;
   container.appendChild(toast);
