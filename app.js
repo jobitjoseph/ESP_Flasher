@@ -117,7 +117,7 @@ function selectProject(id) {
   const bauds = document.getElementById('baud-select');
   if (bauds) {
     bauds.innerHTML = cfg.baud_options.map(b =>
-      `<option value="${b}" ${b === cfg.baud_default ? 'selected' : ''}>${b.toLocaleString()} baud</option>`
+      `<option value="${b}" ${b === cfg.baud_default ? 'selected' : ''}>${b.toLocaleString()}</option>`
     ).join('');
   }
 
