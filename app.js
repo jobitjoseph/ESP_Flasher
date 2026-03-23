@@ -28,7 +28,7 @@ window.setTheme = function (theme) {
   document.getElementById('btn-light').classList.toggle('active', theme === 'light');
 };
 
-// Restore saved theme on load
+// Restore saved theme on load (defaults to light)
 (function () {
   const saved = localStorage.getItem('esp-flasher-theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
@@ -174,7 +174,6 @@ window.handleReset = async function () {
   try {
     log('info', 'Hard resetting device…');
 
-    // If not already flashing, we need to create a temporary loader
     if (!STATE.transport) {
       if (STATE.port.readable) await STATE.port.close();
       const transport = new Transport(STATE.port, true);
@@ -183,9 +182,6 @@ window.handleReset = async function () {
       await loader.hardReset();
       await transport.disconnect();
     } else {
-      // If we have an active loader (during flash), it might be busy,
-      // but hardReset is usually safe. 
-      // Actually, it's better to only allow Reset when NOT flashing.
       showToast('Cannot reset while flashing', 'warning');
     }
   } catch (e) {
@@ -258,9 +254,7 @@ function updateFlashButtons() {
 //  LOCAL FIRMWARE FETCH
 // ════════════════════════════════════════════════════
 async function fetchFirmwareBinary(projectId, fileId) {
-  // Local path: ./firmware/{projectId}/{fileId}
   const url = `./firmware/${projectId}/${fileId}`;
-
   log('info', `  Fetching binary → ${url}…`);
 
   const response = await fetch(url);
@@ -270,7 +264,6 @@ async function fetchFirmwareBinary(projectId, fileId) {
 
   const buffer = await response.arrayBuffer();
   log('success', `  ✓ Loaded ${(buffer.byteLength / 1024).toFixed(1)} KB`);
-
   return buffer;
 }
 
@@ -290,7 +283,6 @@ window.handleErase = async function () {
   try {
     const baud = parseInt(document.getElementById('baud-select')?.value || 115200);
 
-    // Ensure port is closed before ESPLoader takes over
     if (STATE.port.readable) {
       log('dim', '  Closing manual connection…');
       await STATE.port.close();
@@ -349,6 +341,7 @@ window.handleFlash = async function () {
 
       try {
         const buffer = await fetchFirmwareBinary(project.id, f.file_id);
+        // esptool-js@0.4.6 requires data as a binary string (not Uint8Array)
         flashFiles.push({ data: arrayBufferToBinaryString(buffer), address: parseInt(f.address, 16) });
         setBadgeState(f.file_id, 'done');
       } catch (e) {
@@ -360,7 +353,6 @@ window.handleFlash = async function () {
     log('success', `✓ All binaries loaded.`);
     setProgress(35, 'Connecting to chip…');
 
-    // Ensure port is closed before ESPLoader takes over
     if (STATE.port.readable) {
       log('dim', '  Closing manual connection…');
       await STATE.port.close();
@@ -390,14 +382,13 @@ window.handleFlash = async function () {
       compress: true,
       reportProgress(fileIndex, written, total) {
         if (STATE.abortFlash) throw new Error('Flash aborted by user.');
-
-        const filePct = (written / total);
+        const filePct = written / total;
         const overallPct = Math.round(50 + ((fileIndex + filePct) / totalFiles) * 50);
-
         const fileLabel = project.flash[fileIndex]?.label || `File ${fileIndex + 1}`;
         setProgress(Math.min(overallPct, 100), `Writing ${fileLabel}…`);
       },
       calculateMD5Hash(image) {
+        // esptool-js passes a binary string; use Latin1 encoding for accurate MD5
         const wordarray = (typeof image === 'string')
           ? CryptoJS.enc.Latin1.parse(image)
           : CryptoJS.lib.WordArray.create(image);
@@ -461,6 +452,8 @@ function makeTerminal() {
 // ════════════════════════════════════════════════════
 //  UTILITY
 // ════════════════════════════════════════════════════
+
+// Converts ArrayBuffer → binary string (required format for esptool-js@0.4.6)
 function arrayBufferToBinaryString(buffer) {
   const bytes = new Uint8Array(buffer);
   const chunks = [];
@@ -533,4 +526,3 @@ function showToast(message, type = 'info') {
     setTimeout(() => toast.remove(), 300);
   }, 3500);
 }
-
