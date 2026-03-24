@@ -86,7 +86,7 @@ function renderProjects() {
     `<option value="${p.id}">${p.name} (v${p.version || '—'}) [${p.chip}]</option>`
   ).join('');
 
-  select.innerHTML = '<option value="" disabled selected>— Choose a Project —</option>' + options;
+  select.innerHTML = '<option value="" disabled selected>— Choose a Firmware —</option>' + options;
 }
 
 window.selectProject = selectProject;
@@ -120,7 +120,7 @@ function selectProject(id) {
   updateFileBadges();
   updateFlashButtons();
 
-  log('accent', `Project selected: ${cfg.name} (${cfg.chip})`);
+  log('accent', `Firmware selected: ${cfg.name} (${cfg.chip})`);
 }
 
 function updateFileBadges() {
