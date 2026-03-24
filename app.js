@@ -64,11 +64,11 @@ async function loadConfig() {
     const res = await fetch(`./config.json?t=${Date.now()}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     STATE.config = await res.json();
-    log('info', `Loaded ${STATE.config.projects.length} project(s) from config.`);
+    log('info', `Loaded ${STATE.config.projects.length} firmware(s) from config.`);
     renderProjects();
   } catch (e) {
     log('error', `Failed to load config.json: ${e.message}`);
-    showToast('Failed to load project config', 'error');
+    showToast('Failed to load firmware config', 'error');
   }
 }
 
@@ -78,7 +78,7 @@ async function loadConfig() {
 function renderProjects() {
   const select = document.getElementById('project-select');
   if (!STATE.config || !STATE.config.projects.length) {
-    select.innerHTML = '<option value="" disabled>No projects found.</option>';
+    select.innerHTML = '<option value="" disabled>No firmwares found.</option>';
     return;
   }
 
