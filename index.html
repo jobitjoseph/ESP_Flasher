@@ -58,13 +58,13 @@
       <!-- ═══ LEFT COLUMN ═══ -->
       <div class="col-left">
 
-        <!-- 1. Project & Configuration (Consolidated) -->
+        <!-- 1. Firmware (Consolidated) -->
         <div class="card">
           <div class="card-header">
             <div class="card-icon blue">📦</div>
             <div>
-              <div class="card-title">Project & Configuration</div>
-              <div id="project-desc-text" class="card-subtitle">Select a project to begin</div>
+              <div class="card-title">Firmware</div>
+              <div id="project-desc-text" class="card-subtitle">Select a firmware to begin</div>
             </div>
           </div>
 
@@ -74,7 +74,7 @@
               <label for="project-select">Firmware Project</label>
               <div class="select-wrapper">
                 <select id="project-select" onchange="selectProject(this.value)">
-                  <option value="" disabled selected>— Choose a Project —</option>
+                  <option value="" disabled selected>— Choose a firmware —</option>
                 </select>
               </div>
             </div>
@@ -168,7 +168,7 @@
       <div class="col-right">
         <div class="card log-card">
           <div class="console-toolbar">
-            <div class="card-title" style="margin:0; font-size:13px">Project Log Output</div>
+            <div class="card-title" style="margin:0; font-size:13px">ESP Flasher log</div>
             <div style="display:flex; gap:8px;">
               <button onclick="copyLog()" class="btn-icon" title="Copy logs">📋</button>
               <button onclick="clearLog()" class="btn-icon" title="Clear logs">🗑️</button>
@@ -185,7 +185,7 @@
         &copy; 2026 ESP Web Flasher — <a href="https://esclabs.in">ESCLabs.in</a>
       </div>
       <div class="footer-right">
-        Powered by esptool-js & Web Serial API
+        Powered by esptool-js
       </div>
     </footer>
   </div>
