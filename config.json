@@ -1,5 +1,26 @@
 {
   "projects": [
+        {
+      "id": "AiPetBot",
+      "name": "AI Pet Bot V1.0.0",
+      "chip": "ESP32S3",
+      "version": "1.0.0",
+      "description": "AI Pet Bot firmware V1.0.0",
+      "baud_options": [
+        115200,
+        460800,
+        921600
+      ],
+      "baud_default": 921600,
+      "flash_size": "8MB",
+      "flash": [
+        {
+          "address": "0x0",
+          "file_id": "AiPetBot.bin",
+          "label": "AI Pet Bot firmware"
+        }
+      ]
+    },
     {
       "id": "deskbuddy",
       "name": "DeskBuddy V1.0.0",
