@@ -23,10 +23,10 @@
     },
     {
       "id": "deskbuddy",
-      "name": "DeskBuddy V1.0.0",
+      "name": "DeskBuddy V1.2.0",
       "chip": "ESP32C3",
-      "version": "1.0.0",
-      "description": "DeskBuddy firmware V1.0.0",
+      "version": "1.2.0",
+      "description": "DeskBuddy firmware V1.2.0",
       "baud_options": [
         115200,
         460800,
