@@ -43,6 +43,27 @@
       ]
     },
     {
+      "id": "aichatbot",
+      "name": "AI Chat Bot V1.0.0",
+      "chip": "ESP32C3",
+      "version": "1.0.0",
+      "description": "AI Chat Bot firmware V1.2.0",
+      "baud_options": [
+        115200,
+        460800,
+        921600
+      ],
+      "baud_default": 921600,
+      "flash_size": "4MB",
+      "flash": [
+        {
+          "address": "0x0",
+          "file_id": "ESP32C3-AI-CHATBOT.bin",
+          "label": "AI Chat Bot Firmware"
+        }
+      ]
+    },
+    {
       "id": "macgameclock",
       "name": "Game Clock V1.0.0",
       "chip": "ESP32C3",
